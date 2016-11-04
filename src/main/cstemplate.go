@@ -241,18 +241,48 @@ func calllist(ini *goini.INI, client *cloudstack.Client, arguments []string, opt
 func callstatus(client *cloudstack.Client,id string) {
 	params := cloudstack.NewListTemplatesParameter("all")
 	params.Id.Set(id)
+        timer := 0
         for {
             templates, _ := client.ListTemplates(params)
             if len(templates)==0 {
               fmt.Println("id not exist ",id)
               break
             }
+            if timer==0{
+              fmt.Println("waiting")
+            }
             if templates[0].IsReady.Bool(){
-              fmt.Println("IsReady:",templates[0].IsReady.Bool())
+              tsize,_:=templates[0].Size.Int64()
+              //fmt.Println("IsReady:",templates[0].IsReady.Bool(),", cost ",timer/60,"m",timer%60,"s, template size is",tsize/1024/1024,"MB")
+              fmt.Println("IsReady:",templates[0].IsReady.Bool(),", cost ",displaytimer(timer),", template size is",displaysize(tsize))
               break
             }
-            fmt.Println("IsReady:",templates[0].IsReady.Bool(),", wait 30s" )
+            timer=timer+30
+            //fmt.Println("IsReady:",templates[0].IsReady.Bool(),", wait 30s" )
             time.Sleep(30 * time.Second)
         }
+}
+
+func displaytimer(timer int)(timestr string){
+    if timer/3600 >0 {
+       timestr= timestr+fmt.Sprint(timer/3600)+"h"
+    }
+    if timer/60 >0 {
+       timestr= timestr+fmt.Sprint(timer/60)+"m"
+    }
+    if timer%60 >0 {
+       timestr= timestr+fmt.Sprint(timer%60)+"s"
+    }
+    return timestr
+}
+func displaysize(size int64)(sizestr string){
+    if size/1024/1024 >0 {
+       sizestr= sizestr+fmt.Sprintf("%.2f",float64(size)/1024/1024)+"GB"
+    }else if size/1024 >0 {
+       sizestr= sizestr+fmt.Sprintf("%.2f",float64(size)/1024)+"MB"
+    }else {
+       sizestr= sizestr+fmt.Sprint(size)+"KB"
+    }
+    return sizestr
 }
 
