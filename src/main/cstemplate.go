@@ -276,12 +276,12 @@ func displaytimer(timer int)(timestr string){
     return timestr
 }
 func displaysize(size int64)(sizestr string){
-    if size/1024/1024 >0 {
-       sizestr= sizestr+fmt.Sprintf("%.2f",float64(size)/1024/1024)+"GB"
-    }else if size/1024 >0 {
-       sizestr= sizestr+fmt.Sprintf("%.2f",float64(size)/1024)+"MB"
+    if size/1024/1024/1024 >0 {
+       sizestr= fmt.Sprintf("%.1f",float64(size)/1024/1024/1024)+"GB"
+    }else if size/1024/1024 >0 {
+       sizestr= fmt.Sprintf("%.1f",float64(size)/1024/1024)+"MB"
     }else {
-       sizestr= sizestr+fmt.Sprint(size)+"KB"
+       sizestr= fmt.Sprintf("%.1f",float64(size)/1024)+"KB"
     }
     return sizestr
 }
